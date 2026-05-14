@@ -1,10 +1,11 @@
 # geofs-addon-collidable-object
 
 
-this addon adds a heliport to Tokyo Tocho.
+This addon adds a heliport to Tokyo Tocho.
 
+# How to use
 
-
+Paste `main.js` and `2js` into the console one after the other.
 
 
 
