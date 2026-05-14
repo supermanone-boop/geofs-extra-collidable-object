@@ -2,18 +2,18 @@
 
 (() => {
 
-    
+
 
     const CENTER_LAT = 35.689207296197;
     const CENTER_LON = 139.69175111;
-    const CENTER_ALT = 282.8;
+    const CENTER_ALT = 278.4;
 
-   
+
 
     const R = 50;
     const SEG = 12;
 
-    
+
 
     const ring = [];
 
@@ -64,7 +64,7 @@
         );
     }
 
-    
+
 
     const obj = {
 
@@ -96,12 +96,51 @@
 
     };
 
-   
+
 
     geofs.objects.objectList.push(obj);
 
     geofs.objects.loadModels();
 
     console.log("[50M COLLISION ZONE] spawned");
+
+
+
+    const url =
+      "https://raw.githubusercontent.com/supermanone-boop/models/main/heliport.glb";
+
+
+    const LON = 139.69175111;
+    const LAT = 35.689207296197;
+    const HEIGHT = 282.8;
+
+    function spawnModel() {
+      const viewer = geofs.api.viewer;
+
+      const pos = Cesium.Cartesian3.fromDegrees(
+        LON,
+        LAT,
+        HEIGHT
+      );
+
+      const model = viewer.scene.primitives.add(
+        Cesium.Model.fromGltf({
+          url: url,
+          modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(pos),
+          scale: 0.011
+        })
+      );
+
+      console.log("なんとできました");
+      return model;
+    }
+
+
+    const wait = setInterval(() => {
+      if (window.geofs && geofs.api && window.Cesium) {
+        clearInterval(wait);
+        spawnModel();
+      }
+    }, 500);
 
 })();
