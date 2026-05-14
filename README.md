@@ -1,0 +1,1 @@
+# geofs-addon-collidable-object
