@@ -6,7 +6,7 @@
 
     const CENTER_LAT = 35.689207296197;
     const CENTER_LON = 139.69175111;
-    const CENTER_ALT = 281.6;
+    const CENTER_ALT = 281.2;
 
 
 
