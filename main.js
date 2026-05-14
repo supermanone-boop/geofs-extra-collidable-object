@@ -6,7 +6,7 @@
 
     const CENTER_LAT = 35.689207296197;
     const CENTER_LON = 139.69175111;
-    const CENTER_ALT = 278.4;
+    const CENTER_ALT = 282.8;
 
 
 
@@ -112,7 +112,7 @@
 
     const LON = 139.69175111;
     const LAT = 35.689207296197;
-    const HEIGHT = 282.8;
+    const HEIGHT = 278.4;
 
     function spawnModel() {
       const viewer = geofs.api.viewer;
