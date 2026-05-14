@@ -9,5 +9,7 @@ Paste `main.js` and `2js` into the console one after the other.
 
 
 
+35.689207296197,139.69175111
+
 
 
