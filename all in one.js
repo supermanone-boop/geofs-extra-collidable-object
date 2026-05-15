@@ -1,3 +1,251 @@
+'use strict';
+
+(() => {
+
+const LAT = 34.61852487242056;  
+const LON = 134.7954409373162;  
+const ALT = 138.06635526066395;  
+
+const url =  
+  "https://raw.githubusercontent.com/supermanone-boop/models/main/hangar.glb";  
+
+function spawnHangar() {  
+
+    const viewer = geofs.api.viewer;  
+
+    const base = Cesium.Cartesian3.fromDegrees(  
+        LON,  
+        LAT + 0.00105,  
+        ALT  
+    );  
+
+    const enu = Cesium.Transforms.eastNorthUpToFixedFrame(base);  
+
+    const offset = new Cesium.Cartesian3(-40, 0, 0);  
+
+    const shifted = Cesium.Matrix4.multiplyByPoint(  
+        enu,  
+        offset,  
+        new Cesium.Cartesian3()  
+    );  
+
+    const heading = Cesium.Math.toRadians(90);  
+    const hpr = new Cesium.HeadingPitchRoll(heading, 0, 0);  
+
+    const modelMatrix =  
+        Cesium.Transforms.headingPitchRollToFixedFrame(  
+            shifted,  
+            hpr  
+        );  
+
+    viewer.scene.primitives.add(  
+        Cesium.Model.fromGltf({  
+            url: url,  
+            modelMatrix: modelMatrix,  
+            scale: 26  
+        })  
+    );  
+
+    console.log("[HANGAR] moved west +20m");  
+}  
+
+const wait = setInterval(() => {  
+
+    if (window.geofs?.api?.viewer && window.Cesium) {  
+
+        clearInterval(wait);  
+        spawnHangar();  
+
+    }  
+
+}, 300);
+
+})();
+
+(() => {
+
+const viewer = geofs.api.viewer;
+
+const position = Cesium.Cartesian3.fromDegrees(
+    134.79536751320558,
+    34.61874822481465,
+    181.46661531481777
+);
+
+const heading = Cesium.Math.toRadians(180);
+
+const hpr = new Cesium.HeadingPitchRoll(
+    heading,
+    0,
+    0
+);
+
+const modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(
+    position,
+    hpr
+);
+
+viewer.scene.primitives.add(
+    Cesium.Model.fromGltf({
+        url: "https://www.geo-fs.com/backend/aircraft/repository/A400M_380019_5451/z14.gltf",
+        modelMatrix: modelMatrix,
+        scale: 1.0
+    })
+);
+
+console.log("[GLTF SPAWNED + 180° ROTATED]");
+
+})();
+
+(() => {
+
+const A = [34.615018371486485, 134.79226623856255, 179.0664018098515];
+const B = [34.61501910072516, 134.81176269645158, 179.06643436359283];
+
+const viewer = geofs.api.viewer;
+
+function lerp(a, b, t) {
+    return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t
+    ];
+}
+
+function light(pos) {
+
+    return viewer.entities.add({
+
+        position: Cesium.Cartesian3.fromDegrees(
+            pos[1],
+            pos[0],
+            pos[2]
+        ),
+
+        billboard: {
+            image: (() => {
+
+                const c = document.createElement("canvas");
+                c.width = 64;
+                c.height = 64;
+
+                const ctx = c.getContext("2d");
+
+                const g = ctx.createRadialGradient(32,32,2,32,32,32);
+
+                g.addColorStop(0, "rgba(0,255,140,1)");
+                g.addColorStop(0.4, "rgba(0,255,140,0.5)");
+                g.addColorStop(1, "rgba(0,255,140,0)");
+
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(32,32,32,0,Math.PI*2);
+                ctx.fill();
+
+                return c;
+            })(),
+
+            scale: 1.0,
+
+            scaleByDistance: new Cesium.NearFarScalar(
+                50, 1.0,
+                2000, 0.1
+            )
+        }
+    });
+}
+
+const count = 120;
+
+for (let i = 0; i <= count; i++) {
+
+    const t = i / count;
+    const p = lerp(A, B, t);
+
+    light(p);
+}
+
+console.log("[GREEN LIGHT REALISTIC] spawned");
+
+})();
+
+(() => {
+
+const viewer = geofs.api.viewer;
+
+function lerp(a, b, t) {
+    return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t
+    ];
+}
+
+function dist(a, b) {
+
+    const R = 6371000;
+
+    const dLat = (b[0] - a[0]) * Math.PI / 180;
+    const dLon = (b[1] - a[1]) * Math.PI / 180;
+
+    const lat1 = a[0] * Math.PI / 180;
+
+    const x = dLon * Math.cos(lat1);
+    const y = dLat;
+
+    return Math.sqrt(x*x + y*y) * R;
+}
+
+function makeLine(A, B, colorHex) {
+
+    const d = dist(A, B);
+
+    const step = 2.0;
+    const count = Math.max(2, Math.floor(d / step));
+
+    console.log("[LIGHT LINE]", colorHex, "distance:", d, "count:", count);
+
+    for (let i = 0; i <= count; i++) {
+
+        const t = i / count;
+        const p = lerp(A, B, t);
+
+        viewer.entities.add({
+
+            position: Cesium.Cartesian3.fromDegrees(
+                p[1],
+                p[0],
+                p[2] + 0.25
+            ),
+
+            point: {
+
+                pixelSize: 0,
+                color: Cesium.Color.fromCssColorString(colorHex).withAlpha(1.0),
+                outlineColor: Cesium.Color.WHITE.withAlpha(0.2),
+                outlineWidth: 0
+            },
+
+            distanceDisplayCondition:
+                new Cesium.DistanceDisplayCondition(0.0, 3000.0)
+        });
+    }
+}
+
+const A1 = [34.61486651622849, 134.79294209368445, 179.06647222005387];
+const B1 = [34.61486897874252, 134.8114518207117, 179.0665427556996];
+
+makeLine(A1, B1, "#ffd400");
+
+const A2 = [34.61517948317739, 134.8107986721722, 179.06639947160554];
+const B2 = [34.61516810358668, 134.79280917499364, 179.06626453427415];
+
+makeLine(A2, B2, "#ffd400");
+
+console.log("[ALL LIGHT LINES] done");
+
+})();
+
 (() => {
 
 const ZONE_A = {
@@ -18,11 +266,35 @@ const ZONE_C = {
     alt: 278.4
 };
 
-const HANGAR = {
-    lat: 34.61852487242056,
-    lon: 134.7954409373162,
-    alt: 138.06635526066395
-};
+const AIRCRAFT = [
+
+    {
+        name: "A380",
+        lla: [34.617293779346646, 134.80097227352553, 181.9825137569666],
+        url: "https://www.geo-fs.com/models/aircraft/premium/a380/a380.gltf",
+        scale: 1,
+        minimumPixelSize: 0
+    },
+
+    {
+        name: "772",
+        lla: [34.617373460151356, 134.7977016109173, 181.98268817287962],
+        url: "https://www.geo-fs.com/backend/aircraft/repository/Protium%20H1_448101_4016/772-3.glb",
+        scale: 1,
+        minimumPixelSize: 0
+    },
+
+    {
+        name: "747-8F",
+        lla: [34.617103901204814, 134.7943127399184, 183.40703763074646],
+        url: "https://www.geo-fs.com/backend/aircraft/repository/747-8F%20by%20JAaMDG%20and%20Boa93_364320_5409/74D2.glb",
+        scale: 1,
+        minimumPixelSize: 0
+    }
+
+];
+
+let spawnedAircraft = [];
 
 function tri(p0,p1,p2){
 
@@ -124,49 +396,28 @@ function spawnZoneC(){
     console.log("[ZONE C] heliport spawned");
 }
 
-function spawnHangar() {
+function spawnAircraft(obj){
 
     const viewer = geofs.api.viewer;
 
-    const base = Cesium.Cartesian3.fromDegrees(
-        HANGAR.lon,
-        HANGAR.lat + 0.00105,
-        HANGAR.alt - 0.8
+    const pos = Cesium.Cartesian3.fromDegrees(
+        obj.lla[1],
+        obj.lla[0],
+        obj.lla[2]
     );
 
-    const enu = Cesium.Transforms.eastNorthUpToFixedFrame(base);
-
-    const offset = new Cesium.Cartesian3(-40, 0, 0);
-
-    const shifted = Cesium.Matrix4.multiplyByPoint(
-        enu,
-        offset,
-        new Cesium.Cartesian3()
-    );
-
-    const heading = Cesium.Math.toRadians(90);
-
-    const hpr = new Cesium.HeadingPitchRoll(
-        heading,
-        0,
-        0
-    );
-
-    const modelMatrix =
-        Cesium.Transforms.headingPitchRollToFixedFrame(
-            shifted,
-            hpr
-        );
-
-    viewer.scene.primitives.add(
+    const model = viewer.scene.primitives.add(
         Cesium.Model.fromGltf({
-            url: "https://raw.githubusercontent.com/supermanone-boop/models/main/hangar.glb",
-            modelMatrix: modelMatrix,
-            scale: 26
+            url: obj.url,
+            modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(pos),
+            scale: obj.scale,
+            minimumPixelSize: obj.minimumPixelSize
         })
     );
 
-    console.log("[HANGAR] spawned");
+    console.log(`[AIR] ${obj.name} spawned`);
+
+    return model;
 }
 
 const wait = setInterval(() => {
@@ -178,7 +429,11 @@ const wait = setInterval(() => {
         spawnZoneA();
         spawnZoneB();
         spawnZoneC();
-        spawnHangar();
+
+        AIRCRAFT.forEach(a => {
+            const m = spawnAircraft(a);
+            spawnedAircraft.push(m);
+        });
 
     }
 
