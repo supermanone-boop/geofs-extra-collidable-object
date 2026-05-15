@@ -2,35 +2,34 @@
 
 (() => {
 
+    // =========================
+    // ① COLLISIONゾーン用座標
+    // =========================
 
+    const CENTER_A_LAT = 34.610152;
+    const CENTER_A_LON = 134.801031;
+    const CENTER_A_ALT = 179.0290;
 
-    const CENTER_LAT = 35.689207296197;
-    const CENTER_LON = 139.69175111;
-    const CENTER_ALT = 281.2;
+    // =========================
+    // ② GLB表示用座標（別）
+    // =========================
 
+    const CENTER_B_LAT = 34.615500;
+    const CENTER_B_LON = 134.805200;
+    const CENTER_B_ALT = 80;
 
+    // =========================
+    // 2km四方（A用）
+    // =========================
 
-    const R = 50;
-    const SEG = 12;
+    const HALF = 1000;
 
-
-
-    const ring = [];
-
-    for(let i=0;i<SEG;i++){
-
-        const a = (i / SEG) * Math.PI * 2;
-
-        ring.push([
-
-            Math.cos(a) * R,
-            Math.sin(a) * R,
-            0
-
-        ]);
-    }
-
-
+    const corners = [
+        [-HALF, -HALF, 0],
+        [ HALF, -HALF, 0],
+        [ HALF,  HALF, 0],
+        [-HALF,  HALF, 0]
+    ];
 
     function tri(p0,p1,p2){
 
@@ -55,92 +54,78 @@
         return Object.assign([p0,p1,p2], {u,v,n});
     }
 
-    const collisionTriangles = [];
+    const collisionTriangles = [
+        tri(corners[0], corners[1], corners[2]),
+        tri(corners[0], corners[2], corners[3])
+    ];
 
-    for(let i=1;i<SEG-1;i++){
-
-        collisionTriangles.push(
-            tri(ring[0], ring[i], ring[i+1])
-        );
-    }
-
-
+    // =========================
+    // GeoFS collision object（A）
+    // =========================
 
     const obj = {
 
-        name: "50M Collision Zone",
-
+        name: "ZONE A (Collision)",
         type: 100,
 
         url: "https://raw.githubusercontent.com/supermanone-boop/models/main/a10c.glb",
 
         location: [
-            CENTER_LAT,
-            CENTER_LON,
-            CENTER_ALT
+            CENTER_A_LAT,
+            CENTER_A_LON,
+            CENTER_A_ALT
         ],
 
         htr: [0,0,0],
-
         rotateModelOnly: false,
-
         scale: 1,
 
         metricOffset: [0,0,0],
 
-        collisionRadius: 120,
-
+        collisionRadius: 2000,
         collisionTriangles,
 
         options: {}
-
     };
 
-
-
     geofs.objects.objectList.push(obj);
-
     geofs.objects.loadModels();
 
-    console.log("[50M COLLISION ZONE] spawned");
+    console.log("[ZONE A] collision spawned");
 
-
+    // =========================
+    // Cesium GLB（B）
+    // =========================
 
     const url =
-      "https://raw.githubusercontent.com/supermanone-boop/models/main/heliport.glb";
-
-
-    const LON = 139.69175111;
-    const LAT = 35.689207296197;
-    const HEIGHT = 278.4;
+      "https://raw.githubusercontent.com/supermanone-boop/geofs-extra-collidable-object/main/airport.glb";
 
     function spawnModel() {
-      const viewer = geofs.api.viewer;
 
-      const pos = Cesium.Cartesian3.fromDegrees(
-        LON,
-        LAT,
-        HEIGHT
-      );
+        const viewer = geofs.api.viewer;
 
-      const model = viewer.scene.primitives.add(
-        Cesium.Model.fromGltf({
-          url: url,
-          modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(pos),
-          scale: 0.011
-        })
-      );
+        const pos = Cesium.Cartesian3.fromDegrees(
+            CENTER_B_LON,
+            CENTER_B_LAT,
+            CENTER_B_ALT
+        );
 
-      console.log("なんとできました");
-      return model;
+        viewer.scene.primitives.add(
+            Cesium.Model.fromGltf({
+                url: url,
+                modelMatrix: Cesium.Transforms.eastNorthUpToFixedFrame(pos),
+                scale: 50
+            })
+        );
+
+        console.log("[ZONE B] GLB spawned");
     }
 
-
     const wait = setInterval(() => {
-      if (window.geofs && geofs.api && window.Cesium) {
-        clearInterval(wait);
-        spawnModel();
-      }
+        if (window.geofs && geofs.api && window.Cesium) {
+            clearInterval(wait);
+            spawnModel();
+        }
     }, 500);
 
 })();
