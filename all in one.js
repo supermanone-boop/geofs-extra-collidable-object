@@ -16,7 +16,7 @@ function spawnHangar() {
     const base = Cesium.Cartesian3.fromDegrees(  
         LON,  
         LAT + 0.00105,  
-        ALT  
+        ALT - 0.8 
     );  
 
     const enu = Cesium.Transforms.eastNorthUpToFixedFrame(base);  
