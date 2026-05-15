@@ -5,7 +5,7 @@
     const LLA = [34.617373460151356, 134.7977016109173, 181.98268817287962];
 
     const url =
-      "https://www.geo-fs.com/models/aircraft/premium/737_700/737.gltf";
+      "https://www.geo-fs.com/backend/aircraft/repository/Protium%20H1_448101_4016/772-3.glb";
 
     function spawn737() {
 
@@ -32,7 +32,7 @@
             })
         );
 
-        console.log("[737-700] spawned");
+        console.log("[77200] spawned");
 
         return model;
     }
