@@ -27,7 +27,7 @@
 
                 scale: 1,
 
-                minimumPixelSize: 128
+                minimumPixelSize: 0
 
             })
         );
