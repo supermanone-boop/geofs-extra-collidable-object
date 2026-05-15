@@ -215,7 +215,7 @@
             lla: [34.617103901204814, 134.7943127399184, 183.40703763074646],
             url: "https://www.geo-fs.com/backend/aircraft/repository/747-8F%20by%20JAaMDG%20and%20Boa93_364320_5409/74D2.glb",
             scale: 1,
-            minimumPixelSize: 128
+            minimumPixelSize: 0
         }
 
     ];
