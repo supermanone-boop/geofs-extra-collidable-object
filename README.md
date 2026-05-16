@@ -1,7 +1,5 @@
 # geofs-addon-collidable-object
 
-![screenshot](https://raw.githubusercontent.com/supermanone-boop/models/main/Screenshot_2026-05-15-19-48-43-74_3aea4af51f236e4932235fdada7d1643.jpg)
-
 This addon adds a heliport to Tokyo Tocho,offshore airport movingcarrier to geofs.
 
 # How to use
@@ -18,3 +16,9 @@ I will be adding various structures.
 
 The Seto International Airport is now available！！
 
+
+![screenshot](https://raw.githubusercontent.com/supermanone-boop/models/main/Screenshot_2026-05-15-19-48-43-74_3aea4af51f236e4932235fdada7d1643.jpg
+
+# 5/16 moving carrier is available.
+The first carrier leaves from Seto inte'l
+airport!
