@@ -1,5 +1,6 @@
 # geofs-addon-collidable-object
 
+![screenshot](https://raw.githubusercontent.com/supermanone-boop/models/main/Screenshot_2026-05-15-19-48-43-74_3aea4af51f236e4932235fdada7d1643.jpg)
 
 This addon adds a heliport to Tokyo Tocho.
 
